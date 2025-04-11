@@ -7,7 +7,8 @@ const tokenValidator = async (req, res, next) => {
         return res.json({
             status: false,
             message: "Unauthroized",
-            loginIssue: true
+            loginIssue: true,
+            authenticated:false
         })
     }
     else {

@@ -18,13 +18,11 @@ const userSchema = mongoose.Schema({
     like: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "post"
-    }]
+    }],
+    savedDiscussions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'post' }]
 })
 
-userSchema.pre('save', async function () {
-    const hashPassword = await bcrypt.hash(this.password, 10)
-    this.password = hashPassword
-})
+
 userSchema.static('matchPassword', async (email, password) => {
     const user = await this.findOne({ email: email })
     if (!user) return false

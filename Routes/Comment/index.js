@@ -3,9 +3,11 @@ const router = express.Router();
 
 const commentModel = require("../../Model/Comment");
 const postModel = require("../../Model/Discussion");
+const notificationModel = require("../../Model/Notification");
+const userModel = require("../../Model/User");
 
 router.post("/create", async (req, res) => {
-    const {  postID, text } = req.body;
+    const { postID, text } = req.body;
     const userID = req.user
     if (!userID || !postID || !text) {
         return res.status(400).json({
@@ -19,14 +21,22 @@ router.post("/create", async (req, res) => {
         const newComment = await commentModel.create({
             userID,
             postID,
-            content:text
+            content: text
         });
 
         // Add comment ID to post's commentID array
         await postModel.findByIdAndUpdate(postID, {
             $push: { commentID: newComment._id }
         });
-
+        const post = await postModel.findById(postID);
+        const username = await userModel.findById(req.user);
+        await notificationModel.create({
+            recipient: post.userID,
+            sender: req.user,
+            type: 'comment',
+            post: postID,
+            message: `${username.name} commented on your post.`
+        });
         return res.status(201).json({
             status: true,
             message: "Comment added successfully",

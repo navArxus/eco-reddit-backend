@@ -2,11 +2,13 @@ const express = require("express");
 const router = express.Router();
 const discussionModel = require("../../Model/Discussion")
 const userModel = require("../../Model/User")
+const notificationModel = require("../../Model/Notification")
 
 router.post("/create", async (req, res) => {
-    const { title, description, category } = req.body;
+    const { discussion, category } = req.body;
+    console.log(req.user, discussion, category)
     const userID = req.user
-    if (!userID || !title || !description) {
+    if (!userID || !discussion || !category) {
         return res.status(400).json({
             status: false,
             message: "Please provide all required fields: userID, title, and description"
@@ -16,8 +18,7 @@ router.post("/create", async (req, res) => {
     try {
         const newDiscussion = await discussionModel.create({
             userID,
-            title,
-            description,
+            discussion,
             category
             // dateTime will auto-generate
         });
@@ -63,15 +64,15 @@ router.delete("/:id", async (req, res) => {
 });
 
 router.post("/like/:id", async (req, res) => {
-    const userID  = req.user;
+    const userID = req.user;
     const postID = req.params.id;
-    console.log("Params",req.params)
-    console.log("User",userID)
+    console.log("Params", req.params)
+    console.log("User", userID)
     try {
         const post = await discussionModel.findById(postID);
         const user = await userModel.findById(userID);
-        console.log("POST",post)
-        console.log("USER",user)
+        console.log("POST", post)
+        console.log("USER", user)
         if (!post || !user) {
             return res.status(404).json({ status: false, message: "Post or user not found" });
         }
@@ -91,6 +92,15 @@ router.post("/like/:id", async (req, res) => {
             user.like.push(postID);
             await post.save();
             await user.save();
+            const author = await userModel.findById(post.userID) 
+            await notificationModel.create({
+                recipient: post.userID,
+                sender: req.user,
+                type: 'like',
+                post: postID,
+                message: `${user.name} liked your post.`
+            });
+
             return res.json({ status: true, message: "Post liked" });
         }
 

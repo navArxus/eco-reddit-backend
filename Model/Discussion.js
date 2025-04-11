@@ -10,12 +10,7 @@ const postSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "comment"
     }],
-    title: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    description: {
+    discussion: {
         type: String,
         required: true,
         trim: true
@@ -30,7 +25,7 @@ const postSchema = mongoose.Schema({
     }],
     category: {
         type: String,
-        enum: ["Producer", "Consumer", "Decomposer"],
+        enum: ["producer", "consumer", "decomposer"],
         required: true
     }
 });
