@@ -11,6 +11,7 @@ const discussionRoutes = require("./Routes/Discussion/index")
 const commentRoutes = require("./Routes/Comment/index")
 const feedRoute = require("./Routes/Discussion/feed")
 const notificationRoute = require("./Routes/Discussion/notification")
+const profileRoute = require("./Routes/Profile/index")
 
 // Middleware
 const tokenValidator = require("./Middleware/Tokenmiddleware")
@@ -44,6 +45,7 @@ app.use("/discussion", tokenValidator, discussionRoutes)
 app.use("/comment", tokenValidator, commentRoutes)
 app.use("/getDiscussion", tokenValidator, feedRoute)
 app.use("/notification", tokenValidator, notificationRoute)
+app.use("/profile", tokenValidator, profileRoute)
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${process.env.PORT}`)
